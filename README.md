@@ -1,31 +1,32 @@
-# 8 simple rules for a robust, scalable CSS architecture
+# Robust and scalable CSS architecture အတွက် လိုက်နာရန် အချက် ၈ ချက်
 
-### Translations
+### တစ်ခြားဘာသာပြန်များ
 
+- [English (မူရင်း)](https://github.com/jareware/css-architecture)
 - [Português (Brasil)](https://medium.com/tableless/8-regras-simples-para-uma-arquitetura-css-robusta-e-escal%C3%A1vel-545c6dade170)
 - [Chinese](http://www.jianshu.com/p/acb4b9d8ff4f)
 
-This is the manifest of things I've learned about managing CSS in large, complex web projects during my many years of professional web development. I've been asked about these things enough times that having a document to point to sounded like a good idea.
+နှစ်ပေါင်းများစွာ ခက်ခဲတဲ့ project တွေ လုပ်ခဲ့တဲ့ professional web development သက်တမ်းတစ်လျှောက် CSS နဲ့ ပတ်သက်ပြီး သင်ယူရရှိတဲ့ အတွေ့အကြုံတွေကို ဒီမှာ စုစည်းထားတာဖြစ်ပါတယ်။ အဲ့ဒါနဲ့ ပတ်သက်ပြီး ကျွန်တော့်ကို အကြီမ်ကြိမ်မေးကြတဲ့အတွက် အခုလို ချရေးလိုက်တာ ကောင်းမယ်လို့ထင်ပါတယ်။
 
-I've tried to keep the explanations short, but this is essentially the tl;dr:
+ကျွန်တော် အတတ်နိုင်ဆုံး တိုတိုတုတ်တုတ် ရှင်းပါမယ်။ ဒါပေမယ့် အဓိက အကြောင်းအရာတွေကတော့
 
-1. [**Always prefer classes**](#1-always-prefer-classes)
-1. [**Co-locate component code**](#2-co-locate-component-code)
-1. [**Use consistent class namespacing**](#3-use-consistent-class-namespacing)
-1. [**Maintain a strict mapping between namespaces and filenames**](#4-maintain-a-strict-mapping-between-namespaces-and-filenames)
-1. [**Prevent leaking styles outside the component**](#5-prevent-leaking-styles-outside-the-component)
-1. [**Prevent leaking styles inside the component**](#6-prevent-leaking-styles-inside-the-component)
-1. [**Respect component boundaries**](#7-respect-component-boundaries)
-1. [**Integrate external styles loosely**](#8-integrate-external-styles-loosely)
+1. [**Class များကို အမြဲဦးစားပေးသုံးပါ**](#1-always-prefer-classes)
+2. [**Component code ကို တစ်နေရာထဲမှာ ထားပါ**](#2-co-locate-component-code)
+3. [**Class namespacing ကို တသမတ်တည်း သုံးပါ**](#3-use-consistent-class-namespacing)
+4. [**Namespace နဲ့ file နာမည်ကို တူအောင်ထားပါ**](#4-maintain-a-strict-mapping-between-namespaces-and-filenames)
+5. [**Component အပြင်ကို style တွေ မပေါက်ပါစေနဲ့**](#5-prevent-leaking-styles-outside-the-component)
+6. [**Component အတွင်းမှာ style တွေ မပေါက်ပါစေနဲ့**](#6-prevent-leaking-styles-inside-the-component)
+7. [**Component boundary တွေကို လိုက်နာပါ**](#7-respect-component-boundaries)
+8. [**ပြင်ပ style များကို လျော့ပေါင်းပါ**](#8-integrate-external-styles-loosely)
 
-## Introduction
+##  မိတ်ဆက်
 
-If you're working with frontend applications, eventually you'll need to style things. And even though the state-of-the-art of frontend applications keeps blazing ahead, CSS is still the only way to style anything on the web (and lately, in some cases, [native applications too](https://facebook.github.io/react-native/)). There's two broad categories of styling solutions out there, namely:
+Frontend application တွေနဲ့ အလုပ်လုပ်နေသူတစ်ယောက်ဆိုရင် တစ်ချိန်မှာ style သုံးဖို့ လိုလာပါလိမ့်မယ်။ နောက်ဆုံးပေါ် frontend application တွေ ဘယ်လောက် တစ်ရှိန်ထိုးထွက်ထွက်၊ အခုအချိန်ထိ web နဲ့ တစ်ချို့ [native application](https://facebook.github.io/react-native/) တွေမှာ style အတွက် CSS တစ်ခုတည်းကိုသာ အသုံးပြုနေရတုန်းဖြစ်ပါတယ်။ ယေဘုယျပြောရရင် styling လုပ်တဲ့ နည်း နှစ်မျိုးရှိပါတယ်။
 
-* CSS preprocessors, which have been around for ages (such as [SASS](http://sass-lang.com/), [LESS](http://lesscss.org/), and others)
-* CSS-in-JS libraries, which are a relatively new approach to styling (such as [free-style](https://github.com/blakeembrey/free-style), and [many others](https://github.com/MicheleBertoli/css-in-js))
+* CSS preprocessors: သူတို့တွေ ပေါ်နေတာ တော်တော်ကြာပါပြီ။ ([SASS](http://sass-lang.com/)၊ [LESS](http://lesscss.org/) အစရှိသဖြင့်)
+* CSS-in-JS libraries: သူတို့တွေကတော့ အသစ်ပေါ်တဲ့ နည်းတွေလို့ပြောလို့ရပါတယ်။ ([free-style](https://github.com/blakeembrey/free-style) နှင့် [အခြား](https://github.com/MicheleBertoli/css-in-js))
 
-The choice between the two approaches is a topic for a separate article, and as usual, both have their pros and cons. That said, I'll be focusing on the former approach, and if you've chosen to go with the latter, this article will probably be a bit less interesting.
+ဒီနှစ်ခုထဲက ဘယ်ဟာရွေးမလဲဆိုတာကတော့ သီးသန့်အကြောင်းအရာ အနေနဲ့ ဆောင်းပါးတစ်ခုရေးရမှာ ဖြစ်ပါတယ်။ ထုံးစံအတိုင်း နှစ်ခုလုံးမှာ ကောင်းချက်၊ ဆိုးချက်တွေ ရှိပါတယ်။ ကျွန်တော်ကတော့ ပထမနည်းကို အဓိကထားပြီး ပြောမှာဖြစ်တဲ့ အတွက် ဒုတိယနည်းကို ရွေးတဲ့လူတွေအတွက်တော့ သိပ်စိတ်ဝင်စားဖို့ ကောင်းမှာ မဟုတ်ပါဘူး။
 
 ## High-level goals
 
